@@ -11,9 +11,11 @@ public class DrawableCell<T extends Cell> extends Rectangle implements IDrawable
     private final T cell;
     private int x;
     private int y;
+    private int id;
 
-    public DrawableCell(T cell, int width, int height) {
+    public DrawableCell(T cell, int id, int width, int height) {
         super(width, height);
+        this.id = id;
         this.cell = cell;
     }
 
@@ -35,6 +37,23 @@ public class DrawableCell<T extends Cell> extends Rectangle implements IDrawable
 
     public void setPosY(int y) {
         this.y = y;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DrawableCell))
+            return false;
+
+        return ((DrawableCell<?>) obj).getCellID() == this.getCellID();
+    }
+
+    public int getCellID() {
+        return id;
+    }
+
+    @Override
+    public int hashCode() {
+        return getCellID();
     }
 
     @Override

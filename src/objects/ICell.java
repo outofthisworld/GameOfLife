@@ -1,7 +1,5 @@
 package objects;
 
-import objects.Drawable.DrawableCell;
-
 /**
  * Created by Dale on 9/03/16.
  */
@@ -12,15 +10,7 @@ public interface ICell {
 
     void setNextGen(boolean b);
 
-    boolean calculateNextGenState();
+    boolean getNextGenState();
 
-    boolean hasNeighboursCached();
-
-    void cacheNeighbours(DrawableCell[] cells);
-
-    void clearNeighbourCache();
-
-    int getAliveNeighbours();
-
-    int getDeadNeighbours();
+    void calculateNextGenState();
 }

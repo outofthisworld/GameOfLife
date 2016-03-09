@@ -11,34 +11,34 @@ import java.awt.*;
  * Created by Dale on 8/03/16.
  */
 public class GameOfLifeView implements IGameOfLife, Runnable {
-    //The amount of time to wait between game updates.
+    /**
+     * The constant UPDATE_FPS.
+     */
     public static final long UPDATE_FPS = 1000L / 30L;
     private static final GameOfLifeView gol = new GameOfLifeView("Game of life",
             new Dimension(800, 700));
+
     //JComponents
     private final JFrame gameFrame;
+    private final Button startButton = new Button("Start");
     private final GameOfLifeGrid gameOfLifePanel = new GameOfLifeGrid(800, 600, 10, 10);
+
     //Game dimensions
     private final Dimension gameDimension;
     private final double frameWidth;
     private final double frameHeight;
+
     //Listeners
     private final GOLKeyPressListener golKeyPressListener = new GOLKeyPressListener();
+
     //Items to render
     private final Renderable<Graphics>[] renderableItems = new Renderable[]{gameOfLifePanel};
+    private boolean startGenerations = false;
 
-    //Instance initializer
-    {
-        golKeyPressListener.addListener(gameOfLifePanel);
-    }
 
     //Class constructor
     private GameOfLifeView(String gameTitle, Dimension d) {
         gameFrame = new JFrame(gameTitle);
-        Button b = new Button("start");
-        b.setBounds(400 - 70, 650, 80, 30);
-        b.addActionListener(e -> gameOfLifePanel.start());
-        gameFrame.add(b);
         frameWidth = d.getWidth();
         frameHeight = d.getHeight();
         gameDimension = d;
@@ -68,6 +68,9 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
     public void init() {
         gameOfLifePanel.init();
         gameOfLifePanel.setSize(gameDimension);
+        startButton.setBounds(400 - 70, 650, 80, 30);
+        startButton.addActionListener(e -> gameOfLifePanel.nextGeneration());
+        gameFrame.add(startButton);
         gameFrame.add(gameOfLifePanel);
         gameFrame.setVisible(true);
         gameFrame.addKeyListener(golKeyPressListener);
@@ -85,8 +88,8 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
     }
 
     @Override
-    public void nextGeneration() {
-
+    public void update() {
+        //gameOfLifePanel.nextGeneration();
     }
 
     /**
@@ -95,7 +98,7 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
      * @param <T>      the type parameter
      * @param graphics the graphics
      */
-    public <T extends Graphics> void renderGame(T graphics) {
+    public <T extends Graphics> void render(T graphics) {
         for (Renderable<Graphics> obj : renderableItems) {
             obj.render(graphics);
         }
@@ -143,8 +146,8 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
         while (true) {
             if ((System.currentTimeMillis() - loopStartTime) >= UPDATE_FPS) {
                 loopStartTime = System.currentTimeMillis();
-                renderGame(gameOfLifePanel.getGraphics());
-                nextGeneration();
+                render(gameOfLifePanel.getGraphics());
+                update();
             }
         }
     }
