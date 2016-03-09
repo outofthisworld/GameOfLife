@@ -1,6 +1,7 @@
 package game;
 
 import game.interfaces.IGameOfLife;
+import game.interfaces.IUpdateable;
 import game.interfaces.Renderable;
 import game.listeners.GOLKeyPressListener;
 
@@ -11,17 +12,24 @@ import java.awt.*;
  * Created by Dale on 8/03/16.
  */
 public class GameOfLifeView implements IGameOfLife, Runnable {
+
     /**
-     * The constant UPDATE_FPS.
+     * The constant Time between renders.
      */
-    public static final long UPDATE_FPS = 1000L / 30L;
+    public static final long RENDER_FPS = 100L;
+    /**
+     * The constant Time between updates.
+     */
+    public static final long UPDATE_FPS = 500L;
+
+
     private static final GameOfLifeView gol = new GameOfLifeView("Game of life",
             new Dimension(800, 700));
 
     //JComponents
     private final JFrame gameFrame;
     private final Button startButton = new Button("Start");
-    private final GameOfLifeGrid gameOfLifePanel = new GameOfLifeGrid(800, 600, 10, 10);
+    private final GameOfLifeGrid gameOfLifePanel = new GameOfLifeGrid(1000, 1000, 10, 10);
 
     //Game dimensions
     private final Dimension gameDimension;
@@ -33,7 +41,9 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
 
     //Items to render
     private final Renderable<Graphics>[] renderableItems = new Renderable[]{gameOfLifePanel};
-    private boolean startGenerations = false;
+    private final IUpdateable[] updatebleItems = new IUpdateable[]{gameOfLifePanel};
+
+    private boolean upd = false;
 
 
     //Class constructor
@@ -69,7 +79,7 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
         gameOfLifePanel.init();
         gameOfLifePanel.setSize(gameDimension);
         startButton.setBounds(400 - 70, 650, 80, 30);
-        startButton.addActionListener(e -> gameOfLifePanel.nextGeneration());
+        startButton.addActionListener(e -> upd = true);
         gameFrame.add(startButton);
         gameFrame.add(gameOfLifePanel);
         gameFrame.setVisible(true);
@@ -89,7 +99,9 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
 
     @Override
     public void update() {
-        //gameOfLifePanel.nextGeneration();
+        for (IUpdateable items : updatebleItems) {
+            items.update();
+        }
     }
 
     /**
@@ -131,22 +143,19 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
         return gameDimension;
     }
 
-    /**
-     * Gets game of life panel.
-     *
-     * @return the game of life panel
-     */
-    public GameOfLifeGrid getGameOfLifePanel() {
-        return gameOfLifePanel;
-    }
 
     @Override
     public void run() {
-        long loopStartTime = System.currentTimeMillis();
+        long upStartTime = System.currentTimeMillis();
+        long renStartTime = System.currentTimeMillis();
         while (true) {
-            if ((System.currentTimeMillis() - loopStartTime) >= UPDATE_FPS) {
-                loopStartTime = System.currentTimeMillis();
+            if (System.currentTimeMillis() - renStartTime >= RENDER_FPS) {
+                renStartTime = System.currentTimeMillis();
                 render(gameOfLifePanel.getGraphics());
+            }
+            if ((System.currentTimeMillis() - upStartTime) >= UPDATE_FPS) {
+                upStartTime = System.currentTimeMillis();
+                if (upd)
                 update();
             }
         }

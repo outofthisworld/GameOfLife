@@ -1,5 +1,6 @@
 package game;
 
+import game.interfaces.IUpdateable;
 import game.interfaces.Renderable;
 import game.listeners.GridMouseListener;
 import objects.Cell;
@@ -14,7 +15,7 @@ import java.util.HashSet;
 /**
  * Created by Dale on 8/03/16.
  */
-public final class GameOfLifeGrid extends JPanel implements Renderable<Graphics> {
+public final class GameOfLifeGrid extends JPanel implements Renderable<Graphics>, IUpdateable {
     public static final int[][] neighbouringCells = {
             {-1, -1},
             {-1, 0},
@@ -58,14 +59,14 @@ public final class GameOfLifeGrid extends JPanel implements Renderable<Graphics>
                     int liveNeighbours = getAliveNeighbours(drawableCells[j]);
 
                     if (!isAlive && liveNeighbours == 3) {
-                        setNextGen(true);
+                        setNextGenState(true);
                     } else if (isAlive) {
                         if (liveNeighbours < 2) {
-                            setNextGen(false);
+                            setNextGenState(false);
                         } else if (liveNeighbours > 3) {
-                            setNextGen(false);
+                            setNextGenState(false);
                         } else {
-                            setNextGen(true);
+                            setNextGenState(true);
                         }
                     }
                 }
@@ -81,16 +82,10 @@ public final class GameOfLifeGrid extends JPanel implements Renderable<Graphics>
         return (int) Arrays.stream(neighbourCellCache.get(cell)).filter(c -> c.getCell().isAlive()).count();
     }
 
-    public DrawableCell<?>[] getNeighboursWithCache(DrawableCell<?> cell) {
-        if (!neighbourCellCache.containsKey(cell))
-            neighbourCellCache.put(cell, getNeighbouringCells(cell));
-
-        return neighbourCellCache.get(cell);
-    }
-
     public void drawGrid(Graphics g) {
         g.setColor(Color.gray);
 
+        loop:
         for (int y = 0; y < gridSize.height / gridCellHeight; y++) {
             for (int x = 0; x < gridSize.width / gridCellWidth; x++) {
                 DrawableCell<Cell> c = getDrawableCell(x, y);
@@ -101,22 +96,28 @@ public final class GameOfLifeGrid extends JPanel implements Renderable<Graphics>
         }
     }
 
-    public void nextGeneration() {
-        HashSet<DrawableCell<?>> updateableCells = new HashSet<>();
-        gridSeeds.stream().forEach(seed -> {
-            updateableCells.addAll(Arrays.asList(getNeighbouringCells(seed)));
+    public HashSet<DrawableCell<?>> getCellsViableForNextGen(HashSet<DrawableCell<?>> seed) {
+        HashSet<DrawableCell<?>> nextGenerationCells = new HashSet<>();
+
+        seed.stream().forEach(cell -> {
+            nextGenerationCells.add(cell);
+            nextGenerationCells.addAll(Arrays.asList(getNeighbouringCells(cell)));
         });
-        updateableCells.addAll(gridSeeds);
+
+        return nextGenerationCells;
+    }
+
+    public void update() {
+        HashSet<DrawableCell<?>> viableCells = getCellsViableForNextGen(gridSeeds);
         gridSeeds.clear();
-        System.out.println(updateableCells.size());
 
-        updateableCells.stream().forEach(cell -> {
+        viableCells.stream().forEach(cell -> cell.getCell().calculateNextGenState());
 
-            System.out.println("is alive? :" + cell.getCell().isAlive() + " live neighbours " + getAliveNeighbours(cell));
-            cell.getCell().calculateNextGenState();
-            cell.getCell().setIsAlive(cell.getCell().getNextGenState());
-            if (cell.getCell().isAlive()) {
+        viableCells.stream().forEach(cell -> {
+            if (cell.getCell().goNextGen()) {
                 gridSeeds.add(cell);
+            } else {
+                neighbourCellCache.remove(cell);
             }
         });
     }
@@ -126,6 +127,9 @@ public final class GameOfLifeGrid extends JPanel implements Renderable<Graphics>
     }
 
     public DrawableCell<?>[] getNeighbouringCells(DrawableCell<?> cell) {
+        if (neighbourCellCache.containsKey(cell))
+            return neighbourCellCache.get(cell);
+
         DrawableCell<?>[] neighbourCells = new DrawableCell[8];
         for (int i = 0; i < neighbouringCells.length; i++) {
             neighbourCells[i] = getDrawableCell(cell.getPosX() + neighbouringCells[i][0],
@@ -159,7 +163,7 @@ public final class GameOfLifeGrid extends JPanel implements Renderable<Graphics>
     }
 
     public DrawableCell<Cell> getDrawableCell(int x, int y) {
-        return drawableCells[(y * (gridSize.width / gridCellWidth)) + x];
+        return drawableCells[(((y * (gridSize.width / gridCellWidth)) + x))];
     }
 
     public Cell getCell(int x, int y) {

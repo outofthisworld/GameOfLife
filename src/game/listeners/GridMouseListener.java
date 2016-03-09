@@ -27,7 +27,7 @@ public class GridMouseListener<T extends GameOfLifeGrid> implements MouseListene
         mouseIsDown = true;
         DrawableCell c = gameOfLifeGrid.getDrawableCellAtMouseCoords(e.getX(), e.getY());
         c.getCell().toggleIsAlive();
-        c.getCell().setNextGen(c.getCell().isAlive());
+        c.getCell().setNextGenState(c.getCell().isAlive());
         if (c.getCell().isAlive()) {
             gameOfLifeGrid.addSeed(c);
         } else {
@@ -57,7 +57,7 @@ public class GridMouseListener<T extends GameOfLifeGrid> implements MouseListene
 
         DrawableCell c = gameOfLifeGrid.getDrawableCellAtMouseCoords(e.getX(), e.getY());
         c.getCell().setIsAlive(true);
-        c.getCell().setNextGen(true);
+        c.getCell().setNextGenState(true);
 
         if (!gameOfLifeGrid.containsSeed(c))
             gameOfLifeGrid.addSeed(c);

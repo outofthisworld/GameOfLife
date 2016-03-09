@@ -8,9 +8,5 @@ public interface ICell {
 
     void setIsAlive(boolean b);
 
-    void setNextGen(boolean b);
-
-    boolean getNextGenState();
-
     void calculateNextGenState();
 }
