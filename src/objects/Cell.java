@@ -3,7 +3,7 @@ package objects;
 /**
  * Created by Dale on 8/03/16.
  */
-public abstract class Cell implements ICell {
+public class Cell implements ICell {
     private boolean isAlive = false;
     private boolean nextGenState = false;
 
@@ -20,19 +20,23 @@ public abstract class Cell implements ICell {
         return isAlive;
     }
 
+    @Override
     public boolean getNextGenState() {
         return nextGenState;
     }
 
+    @Override
     public void setNextGenState(boolean b) {
         this.nextGenState = b;
     }
 
-    public boolean goNextGen() {
+    @Override
+    public boolean transform() {
         setIsAlive(getNextGenState());
         return isAlive();
     }
 
+    @Override
     public void toggleIsAlive() {
         isAlive = isAlive ? false : true;
     }

@@ -8,5 +8,11 @@ public interface ICell {
 
     void setIsAlive(boolean b);
 
-    void calculateNextGenState();
+    boolean getNextGenState();
+
+    void setNextGenState(boolean b);
+
+    void toggleIsAlive();
+
+    boolean transform();
 }

@@ -4,6 +4,7 @@ import game.interfaces.IGameOfLife;
 import game.interfaces.IUpdateable;
 import game.interfaces.Renderable;
 import game.listeners.GOLKeyPressListener;
+import objects.Cell;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +30,7 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
     //JComponents
     private final JFrame gameFrame;
     private final Button startButton = new Button("Start");
-    private final GameOfLifeGrid gameOfLifePanel = new GameOfLifeGrid(1000, 1000, 10, 10);
+    private final GameOfLifeGrid<Cell> gameOfLifePanel = new GameOfLifeGrid(1000, 1000, 10, 10, () -> new Cell());
 
     //Game dimensions
     private final Dimension gameDimension;
@@ -76,7 +77,6 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
 
     @Override
     public void init() {
-        gameOfLifePanel.init();
         gameOfLifePanel.setSize(gameDimension);
         startButton.setBounds(400 - 70, 650, 80, 30);
         startButton.addActionListener(e -> upd = true);
