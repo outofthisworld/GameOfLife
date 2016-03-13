@@ -10,13 +10,14 @@ import org.junit.Assert;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
+import java.util.Optional;
 
 /**
  * GameOfLifeGrid Tester.
  *
  * @author <Authors name>
- * @since <pre>03/13/2016</pre>
  * @version 1.0
+ * @since <pre>03/13/2016</pre>
  */
 public class GameOfLifeGridTest extends TestCase {
     private final GameOfLifeGrid<Cell> gameOfLifeGrid = new GameOfLifeGrid(2000, 2000, 0, 0, 10, 10, () -> new Cell()) {
@@ -26,10 +27,20 @@ public class GameOfLifeGridTest extends TestCase {
         }
     };
 
+    /**
+     * Instantiates a new Game of life grid test.
+     *
+     * @param name the name
+     */
     public GameOfLifeGridTest(String name) {
         super(name);
     }
 
+    /**
+     * Suite test.
+     *
+     * @return the test
+     */
     public static Test suite() {
         return new TestSuite(GameOfLifeGridTest.class);
     }
@@ -44,13 +55,23 @@ public class GameOfLifeGridTest extends TestCase {
         super.tearDown();
     }
 
+    /**
+     * Test get alive neighbours.
+     *
+     * @throws Exception the exception
+     */
     public void testGetAliveNeighbours() throws Exception {
         Assert.assertTrue(gameOfLifeGrid.setCellAlive(10, 10));
         Assert.assertTrue(gameOfLifeGrid.setCellAlive(10, 11));
         int neighbours = gameOfLifeGrid.getAliveNeighbours(gameOfLifeGrid.getDrawableCell(10, 10).get());
-        Assert.assertTrue(neighbours == 1);
+        Assert.assertEquals(neighbours, 1);
     }
 
+    /**
+     * Test get cells viable for next gen.
+     *
+     * @throws Exception the exception
+     */
     public void testGetCellsViableForNextGen() throws Exception {
         gameOfLifeGrid.addSeed(10, 10);
         gameOfLifeGrid.addSeed(10, 11);
@@ -63,167 +84,60 @@ public class GameOfLifeGridTest extends TestCase {
         Assert.assertEquals(nGenCells.size(), 15);
     }
 
+    /**
+     * Test calculate next gen seed state.
+     *
+     * @throws Exception the exception
+     */
+    public void testCalculateNextGenSeedState() throws Exception {
+        int x1 = 10, x2 = 10, x3 = 10, y1 = 10, y2 = 11, y3 = 12;
+
+        gameOfLifeGrid.addSeed(x1, y1);
+        gameOfLifeGrid.addSeed(x2, y2);
+        gameOfLifeGrid.addSeed(x3, y3);
+        HashSet<DrawableCell<Cell>> nGenCells = gameOfLifeGrid.getCellsViableForNextGen(true);
+        gameOfLifeGrid.calculateNextGenSeedState(nGenCells);
+        for (DrawableCell<Cell> cells : nGenCells) {
+            if (cells.getPosX() == x1 && cells.getPosY() == y1)
+                Assert.assertFalse(cells.getCell().getNextGenState());
+            if (cells.getPosX() == x2 && cells.getPosY() == y2)
+                Assert.assertTrue(cells.getCell().getNextGenState());
+            if (cells.getPosX() == x3 && cells.getPosY() == y3)
+                Assert.assertFalse(cells.getCell().getNextGenState());
+        }
+    }
+
+    /**
+     * Test get neighbouring cells.
+     *
+     * @throws Exception the exception
+     */
     public void testGetNeighbouringCells() throws Exception {
-        //TODO: Test goes here...
-    }
+        /** Get the neighbouring cells of the following coords **/
+        int x = 5;
+        int y = 6;
+        /*******************************************************/
 
-    public void testSetGetGridHeight() throws Exception {
-        //TODO: Test goes here...
-    }
+        Optional<DrawableCell<Cell>[]> c = gameOfLifeGrid.getNeighbouringCells(x, y);
+        //C will not be present if given x,y coords are out of bounds.
+        assertTrue(c.isPresent());
+        DrawableCell<Cell>[] neighbourCells = c.get();
 
-    public void testSetGetGridWidth() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetCellAtMouseCoords() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetDrawableCellAtMouseCoords() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetDrawableCell() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetCell() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetGetScale() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetyOffset() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetxOffset() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetViewPortSize() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetAccessibleName() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetAccessibleDescription() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetAccessibleRole() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetAccessibleStateSet() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetAccessibleParent() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetAccessibleIndexInParent() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetAccessibleChildrenCount() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetAccessibleChild() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetLocale() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetAccessibleComponent() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetGetBackground() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetGetForeground() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetGetCursor() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetGetFont() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetFontMetrics() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetEnabled() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetVisible() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetLocationOnScreen() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetGetLocation() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetGetBounds() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testSetGetSize() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetAccessibleAt() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetCapabilities() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetDrawGraphics() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetCapabilities1() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetDrawGraphics1() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetBackBuffer() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetBackBuffer1() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetCapabilities2() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    public void testGetDrawGraphics2() throws Exception {
-        //TODO: Test goes here...
+        int count = 0;
+        //Loop through neighbour x,y coords
+        for (int i = x - 1; i <= x + 1; i++) {
+            for (int j = y - 1; j <= y + 1; j++) {
+                if (i == x && j == y)
+                    continue;
+                for (DrawableCell<Cell> ce : neighbourCells) {
+                    if (ce.getPosX() == i && ce.getPosY() == j) {
+                        count++;
+                        break;
+                    }
+                }
+            }
+        }
+        //Should always be 8 if the should the first assertion pass
+        assertEquals(count, 8);
     }
 }

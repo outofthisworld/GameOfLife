@@ -27,7 +27,11 @@ public class GridMouseListener<T extends GameOfLifeGrid> implements MouseListene
             return;
 
         mouseIsDown = true;
-        gameOfLifeGrid.addSeedFromMouseCoords((e.getX()), (e.getY()));
+        if (gameOfLifeGrid.cellIsAliveAtMouseCoords(e.getX(), e.getY())) {
+            gameOfLifeGrid.removeSeedAtMouseCoords(e.getX(), e.getY());
+        } else {
+            gameOfLifeGrid.addSeedFromMouseCoords((e.getX()), (e.getY()));
+        }
     }
 
     @Override
@@ -50,12 +54,10 @@ public class GridMouseListener<T extends GameOfLifeGrid> implements MouseListene
         if (!mouseIsDown)
             return;
 
-        gameOfLifeGrid.addSeedFromMouseCoords((e.getX()), e.getY());
+        gameOfLifeGrid.addSeedFromMouseCoords((e.getX()), (e.getY()));
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-
     }
-
 }

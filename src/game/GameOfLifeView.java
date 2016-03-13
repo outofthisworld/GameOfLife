@@ -103,7 +103,8 @@ public class GameOfLifeView implements IGameOfLife, Runnable, ComponentListener 
         gameOfLifePanel.setSize(gameDimension);
         gridLayout.addLayoutComponent("gamePanel", gameOfLifePanel);
         gridLayout.preferredLayoutSize(gameFrame);
-        startButton.setBounds(400 - 70, 650, 80, 30);
+        startButton.setBounds(gameFrame.getWidth() / 2 - 70, gameFrame.getHeight() - 100, 80, 30);
+
         startButton.addActionListener(e -> upd = true);
         gameFrame.add(startButton);
         gameFrame.add(gameOfLifePanel);
@@ -190,7 +191,7 @@ public class GameOfLifeView implements IGameOfLife, Runnable, ComponentListener 
 
     @Override
     public void componentResized(ComponentEvent e) {
-
+        startButton.setBounds(e.getComponent().getWidth() / 2 - 70, gameFrame.getHeight() - 100, 80, 30);
     }
 
     @Override
