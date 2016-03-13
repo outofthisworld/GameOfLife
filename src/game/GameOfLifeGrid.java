@@ -61,7 +61,7 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
         cellSupplier = supplier;
         setMinimumSize(gridSize);
         setPreferredSize(gridSize);
-        drawableCells = new DrawableCell[(maxWd / gridCellWidth) * (mxH / gridCellHeight) + 1000];
+        drawableCells = new DrawableCell[(maxWd / gridCellWidth) * (mxH / gridCellHeight)];
         imageBuffer = new BufferedImage(getViewPortSize().width, getViewPortSize().height, BufferedImage.TYPE_INT_RGB);
         addKeyListener(this);
     }
@@ -118,6 +118,15 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
         return nextGenerationCells;
     }
 
+    public boolean setCellAlive(int x, int y) {
+        Optional<DrawableCell<T>> cell;
+        if (!(cell = getDrawableCell(x, y)).isPresent())
+            return false;
+
+        cell.get().getCell().setIsAlive(true);
+        return true;
+    }
+
     private HashSet<DrawableCell<T>> calculateNextGenSeedState(HashSet<DrawableCell<T>> cells) {
         cells.stream().forEach(cell -> {
             boolean isAlive = cell.getCell().isAlive();
@@ -141,10 +150,6 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
         });
     }
 
-    public boolean containsSeed(DrawableCell<T> cell) {
-        return gridSeeds.contains(cell);
-    }
-
     public DrawableCell<T>[] getNeighbouringCells(DrawableCell<T> cell) {
         if (neighbourCellCache.containsKey(cell))
             return neighbourCellCache.get(cell);
@@ -160,6 +165,7 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
         }
         return nCells.toArray(new DrawableCell[]{});
     }
+
 
     public int getGridHeight() {
         return gridSize.height;
@@ -209,12 +215,39 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
         this.scale = scale;
     }
 
-    public void addSeed(DrawableCell<T> cell) {
-        gridSeeds.add(cell);
+
+    public boolean addSeed(int x, int y) {
+        Optional<DrawableCell<T>> cell;
+        if ((cell = getDrawableCell(x, y)).isPresent()) {
+            cell.get().getCell().setIsAlive(true);
+            gridSeeds.add(cell.get());
+            return true;
+        }
+        return false;
     }
 
-    public void removeSeed(DrawableCell<?> cell) {
-        gridSeeds.remove(cell);
+    public boolean addSeedFromMouseCoords(int x, int y) {
+        Optional<DrawableCell<T>> cell;
+        if ((cell = getDrawableCellAtMouseCoords(x, y)).isPresent()) {
+            cell.get().getCell().setIsAlive(true);
+            gridSeeds.add(cell.get());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeSeed(int x, int y) {
+        DrawableCell<T> c = getDrawableCell(x, y).orElse(null);
+        if (c != null)
+            c.getCell().setIsAlive(false);
+        return gridSeeds.remove(c);
+    }
+
+    public boolean removeSeedAtMouseCoords(int x, int y) {
+        DrawableCell<T> c = getDrawableCellAtMouseCoords(x, y).orElse(null);
+        if (c != null)
+            c.getCell().setIsAlive(false);
+        return gridSeeds.remove(c);
     }
 
     public void setyOffset(int yOffset) {

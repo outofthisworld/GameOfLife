@@ -1,12 +1,10 @@
 package game.listeners;
 
 import game.GameOfLifeGrid;
-import objects.drawable.DrawableCell;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.Optional;
 
 /**
  * Created by Dale on 9/03/16.
@@ -29,16 +27,7 @@ public class GridMouseListener<T extends GameOfLifeGrid> implements MouseListene
             return;
 
         mouseIsDown = true;
-        Optional<DrawableCell<?>> c = gameOfLifeGrid.getDrawableCellAtMouseCoords((e.getX()), (e.getY()));
-        if (c.isPresent()) {
-            c.get().getCell().toggleIsAlive();
-            c.get().getCell().setNextGenState(c.get().getCell().isAlive());
-            if (c.get().getCell().isAlive()) {
-                gameOfLifeGrid.addSeed(c.get());
-            } else {
-                gameOfLifeGrid.removeSeed(c.get());
-            }
-        }
+        gameOfLifeGrid.addSeedFromMouseCoords((e.getX()), (e.getY()));
     }
 
     @Override
@@ -61,15 +50,7 @@ public class GridMouseListener<T extends GameOfLifeGrid> implements MouseListene
         if (!mouseIsDown)
             return;
 
-        Optional<DrawableCell<?>> c = gameOfLifeGrid.getDrawableCellAtMouseCoords((e.getX()), e.getY());
-        if (!c.isPresent())
-            return;
-
-        c.get().getCell().setIsAlive(true);
-        c.get().getCell().setNextGenState(true);
-
-        if (!gameOfLifeGrid.containsSeed(c.get()))
-            gameOfLifeGrid.addSeed(c.get());
+        gameOfLifeGrid.addSeedFromMouseCoords((e.getX()), e.getY());
     }
 
     @Override
