@@ -17,7 +17,7 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
     /**
      * The constant Time between renders.
      */
-    public static final long RENDER_FPS = 100L;
+    public static final long RENDER_FPS = 500L;
     /**
      * The constant Time between updates.
      */
@@ -30,7 +30,12 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
     //JComponents
     private final JFrame gameFrame;
     private final Button startButton = new Button("Start");
-    private final GameOfLifeGrid<Cell> gameOfLifePanel = new GameOfLifeGrid(1000, 1000, 10, 10, () -> new Cell());
+    private final GameOfLifeGrid<Cell> gameOfLifePanel = new GameOfLifeGrid(10000, 10000, 10, 10, () -> new Cell()) {
+        @Override
+        protected Dimension getViewPortSize() {
+            return new Dimension(gameFrame.getWidth(), gameFrame.getHeight());
+        }
+    };
 
     //Game dimensions
     private final Dimension gameDimension;
@@ -155,8 +160,10 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
             }
             if ((System.currentTimeMillis() - upStartTime) >= UPDATE_FPS) {
                 upStartTime = System.currentTimeMillis();
-                if (upd)
-                update();
+                if (upd) {
+                    System.out.println("updating");
+                    update();
+                }
             }
         }
     }

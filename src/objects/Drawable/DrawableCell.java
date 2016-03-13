@@ -1,7 +1,7 @@
-package objects.Drawable;
+package objects.drawable;
 
 import objects.ICell;
-import utils.RGBColor;
+import utils.IRGBColor;
 
 import java.awt.*;
 import java.util.Objects;
@@ -15,7 +15,7 @@ public class DrawableCell<T extends ICell> extends Rectangle implements IDrawabl
     private int x;
     private int y;
 
-    public DrawableCell(T cell, int width, int height, int x, int y, RGBColor color) {
+    public DrawableCell(T cell, int width, int height, int x, int y, IRGBColor color) {
         super(width, height);
         this.cell = cell;
         this.x = x;
@@ -23,7 +23,6 @@ public class DrawableCell<T extends ICell> extends Rectangle implements IDrawabl
         float[] HSB = Color.RGBtoHSB(color.getR(), color.getG(), color.getB(), null);
         cellColor = Color.getHSBColor(HSB[0], HSB[1], HSB[2]);
     }
-
 
     public T getCell() {
         return cell;
@@ -62,12 +61,12 @@ public class DrawableCell<T extends ICell> extends Rectangle implements IDrawabl
     @Override
     public void draw(Graphics g, double xPos, double yPos) {
         Color orig = g.getColor();
-        if (cellColor != null)
-            g.setColor(cellColor);
 
         if (getCell().isAlive()) {
+            g.setColor(cellColor);
             g.fillRect((int) xPos, (int) yPos, width, height);
         } else {
+            g.setColor(Color.gray);
             g.clearRect((int) xPos, (int) yPos, width, height);
             g.drawRect((int) xPos, (int) yPos, width, height);
         }

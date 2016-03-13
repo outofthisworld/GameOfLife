@@ -1,4 +1,4 @@
-package objects.Drawable;
+package objects.drawable;
 
 import java.awt.*;
 
