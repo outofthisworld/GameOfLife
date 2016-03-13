@@ -8,46 +8,66 @@ import objects.Cell;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 /**
  * Created by Dale on 8/03/16.
  */
-public class GameOfLifeView implements IGameOfLife, Runnable {
+public class GameOfLifeView implements IGameOfLife, Runnable, WindowListener, ComponentListener {
 
-    /**
-     * The constant Time between renders.
-     */
-    public static final long RENDER_FPS = 1000 / 30L;
     /**
      * The constant Time between updates.
      */
     public static final long UPDATE_FPS = 600L;
 
-
+    /**
+     * The view
+     */
     private static final GameOfLifeView gol = new GameOfLifeView("Game of life",
             new Dimension(800, 700));
 
-    //JComponents
+    /**
+     * J components
+     */
     private final JFrame gameFrame;
     private final Button startButton = new Button("Start");
     private final GameOfLifeGrid<Cell> gameOfLifePanel;
 
-    //Game dimensions
+    /**
+     * Dimensions
+     */
     private final Dimension gameDimension;
     private final double frameWidth;
     private final double frameHeight;
 
-    //Listeners
+    /**
+     * Listeners
+     */
     private final GOLKeyPressListener golKeyPressListener = new GOLKeyPressListener();
 
-    //Items to render
+    /**
+     * Render items
+     */
     private final Renderable<Graphics>[] renderableItems;
+
+    /**
+     * Updateable items
+     */
     private final IUpdateable[] updatebleItems;
 
+    /**
+     * State
+     */
     private boolean upd = false;
+    private boolean pause = false;
 
 
-    //Class constructor
+    /**
+     * Constructs a new game of life view
+     */
     private GameOfLifeView(String gameTitle, Dimension d) {
         gameFrame = new JFrame(gameTitle);
         frameWidth = d.getWidth();
@@ -62,6 +82,8 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
         };
         renderableItems = new Renderable[]{gameOfLifePanel};
         updatebleItems = new IUpdateable[]{gameOfLifePanel};
+        gameFrame.addWindowListener(this);
+        gameFrame.addComponentListener(this);
         gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
@@ -155,19 +177,74 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
     @Override
     public void run() {
         long upStartTime = System.currentTimeMillis();
-        long renStartTime = System.currentTimeMillis();
+
         while (true) {
-            if (System.currentTimeMillis() - renStartTime >= RENDER_FPS) {
-                renStartTime = System.currentTimeMillis();
-                render(gameOfLifePanel.getGraphics());
-            }
+            if (pause)
+                return;
+
+
+            render(gameOfLifePanel.getGraphics());
             if ((System.currentTimeMillis() - upStartTime) >= UPDATE_FPS) {
                 upStartTime = System.currentTimeMillis();
                 if (upd) {
-                    System.out.println("updating");
                     update();
                 }
             }
         }
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+        pause = false;
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        stop();
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+        stop();
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+        pause = true;
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+        pause = true;
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+        pause = false;
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+        pause = true;
+    }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+
     }
 }
