@@ -17,11 +17,11 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
     /**
      * The constant Time between renders.
      */
-    public static final long RENDER_FPS = 500L;
+    public static final long RENDER_FPS = 1000 / 30L;
     /**
      * The constant Time between updates.
      */
-    public static final long UPDATE_FPS = 500L;
+    public static final long UPDATE_FPS = 600L;
 
 
     private static final GameOfLifeView gol = new GameOfLifeView("Game of life",
@@ -30,12 +30,7 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
     //JComponents
     private final JFrame gameFrame;
     private final Button startButton = new Button("Start");
-    private final GameOfLifeGrid<Cell> gameOfLifePanel = new GameOfLifeGrid(10000, 10000, 10, 10, () -> new Cell()) {
-        @Override
-        protected Dimension getViewPortSize() {
-            return new Dimension(gameFrame.getWidth(), gameFrame.getHeight());
-        }
-    };
+    private final GameOfLifeGrid<Cell> gameOfLifePanel;
 
     //Game dimensions
     private final Dimension gameDimension;
@@ -46,8 +41,8 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
     private final GOLKeyPressListener golKeyPressListener = new GOLKeyPressListener();
 
     //Items to render
-    private final Renderable<Graphics>[] renderableItems = new Renderable[]{gameOfLifePanel};
-    private final IUpdateable[] updatebleItems = new IUpdateable[]{gameOfLifePanel};
+    private final Renderable<Graphics>[] renderableItems;
+    private final IUpdateable[] updatebleItems;
 
     private boolean upd = false;
 
@@ -59,6 +54,14 @@ public class GameOfLifeView implements IGameOfLife, Runnable {
         frameHeight = d.getHeight();
         gameDimension = d;
         gameFrame.setSize(d);
+        gameOfLifePanel = new GameOfLifeGrid(10000, 10000, 10, 10, () -> new Cell()) {
+            @Override
+            protected Dimension getViewPortSize() {
+                return new Dimension(gameFrame.getWidth(), gameFrame.getHeight());
+            }
+        };
+        renderableItems = new Renderable[]{gameOfLifePanel};
+        updatebleItems = new IUpdateable[]{gameOfLifePanel};
         gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 

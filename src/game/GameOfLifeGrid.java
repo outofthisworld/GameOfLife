@@ -9,6 +9,9 @@ import utils.IRGBColor;
 import utils.RGBColor;
 
 import java.awt.*;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -36,12 +39,13 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
     private int yOffset = 0;
     private int xOffset = 0;
     private double scale = 1d;
+    private BufferedImage imageBuffer;
     private Supplier<T> cellSupplier;
 
 
     {
-        GridMouseListener<GameOfLifeGrid> mMotionListener = new GridMouseListener<>(this);
-        addMouseListener(mMotionListener);
+        MouseMotionListener mMotionListener = new GridMouseListener<>(this);
+        addMouseListener((MouseListener) mMotionListener);
         addMouseMotionListener(mMotionListener);
     }
 
@@ -53,10 +57,13 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
         setMinimumSize(gridSize);
         setPreferredSize(gridSize);
         drawableCells = new DrawableCell[(gridWidth / gridCellWidth) * (gridHeight / gridCellHeight)];
+        imageBuffer = new BufferedImage(getViewPortSize().width, getViewPortSize().height, BufferedImage.TYPE_INT_RGB);
     }
 
     private void drawGrid(Graphics g) {
-        g.setColor(Color.gray);
+        if (imageBuffer.getWidth() != getViewPortSize().width || imageBuffer.getHeight() != getViewPortSize().height)
+            imageBuffer = new BufferedImage(getViewPortSize().width, getViewPortSize().height, BufferedImage.TYPE_INT_RGB);
+
         loop:
         for (int y = 0; y < getViewPortSize().height / gridCellHeight; y++) {
             for (int x = 0; x < getViewPortSize().width / gridCellWidth; x++) {
@@ -64,10 +71,14 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
                 if (!(c = getDrawableCell(x, y)).isPresent())
                     c = createDrawableCell(x, y);
 
-                if (c.isPresent())
-                    c.get().draw(g, (x * gridCellWidth + xOffset) * scale, (y * gridCellHeight + yOffset) * scale);
+                if (c.isPresent()) {
+                    c.get().draw(imageBuffer.getGraphics(), (x * gridCellWidth + xOffset) * scale, (y * gridCellHeight + yOffset) * scale);
+                }
             }
         }
+
+        g.drawImage(imageBuffer, 0, 0, getViewPortSize().width, getViewPortSize().height, null);
+        imageBuffer.getGraphics().clearRect(0, 0, getViewPortSize().width, getViewPortSize().height);
     }
 
     public Optional<DrawableCell<T>> createDrawableCell(int x, int y) {
@@ -165,11 +176,13 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
     }
 
     public Optional<DrawableCell<T>> getDrawableCellAtMouseCoords(int mouseX, int mouseY) {
-        return getDrawableCell((int) ((mouseX / gridCellWidth) * getScale()), (int) ((mouseY / gridCellHeight) * scale));
+        return getDrawableCell((int) (mouseX / (gridCellWidth * getScale())), (int) (mouseY / (gridCellHeight * getScale())));
     }
 
     public Optional<DrawableCell<T>> getDrawableCell(int x, int y) {
         int index = ((y * (gridSize.width / gridCellWidth) + x));
+        if (index > drawableCells.length || index < 0)
+            return Optional.empty();
         return Optional.ofNullable(drawableCells[index]);
     }
 
