@@ -9,6 +9,8 @@ import utils.IRGBColor;
 import utils.RGBColor;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
@@ -18,7 +20,7 @@ import java.util.function.Supplier;
 /**
  * Created by Dale on 8/03/16.
  */
-public abstract class GameOfLifeGrid<T extends ICell> extends Component implements Renderable<Graphics>, IUpdateable {
+public abstract class GameOfLifeGrid<T extends ICell> extends Component implements Renderable<Graphics>, IUpdateable, KeyListener {
     public static final int[][] neighbouringCells = {
             {-1, -1},
             {-1, 0},
@@ -33,15 +35,16 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
     private final HashMap<DrawableCell<T>, DrawableCell<T>[]> neighbourCellCache = new HashMap<>();
     private final DrawableCell<T>[] drawableCells;
     private final Dimension gridSize;
-    private final IRGBColor cellColor = new RGBColor(100, 100, 100);
+    private final IRGBColor cellColor = new RGBColor(11, 240, 118);
     private int gridCellWidth;
     private int gridCellHeight;
     private int yOffset = 0;
     private int xOffset = 0;
-    private double scale = 1d;
+    private double scale = 1.5d;
     private BufferedImage imageBuffer;
     private Supplier<T> cellSupplier;
-
+    private int insetLR;
+    private int insetTB;
 
     {
         MouseMotionListener mMotionListener = new GridMouseListener<>(this);
@@ -49,15 +52,18 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
         addMouseMotionListener(mMotionListener);
     }
 
-    public GameOfLifeGrid(int gridWidth, int gridHeight, int cellWidth, int cellHeight, Supplier<T> supplier) {
-        gridSize = new Dimension(gridWidth, gridHeight);
+    public GameOfLifeGrid(int maxWd, int mxH, int insetLR, int insetTB, int cellWidth, int cellHeight, Supplier<T> supplier) {
+        gridSize = new Dimension(getViewPortSize().width, getViewPortSize().height);
+        this.insetLR = insetLR;
+        this.insetTB = insetTB;
         gridCellWidth = (cellWidth);
         gridCellHeight = (cellHeight);
         cellSupplier = supplier;
         setMinimumSize(gridSize);
         setPreferredSize(gridSize);
-        drawableCells = new DrawableCell[(gridWidth / gridCellWidth) * (gridHeight / gridCellHeight)];
+        drawableCells = new DrawableCell[(maxWd / gridCellWidth) * (mxH / gridCellHeight) + 1000];
         imageBuffer = new BufferedImage(getViewPortSize().width, getViewPortSize().height, BufferedImage.TYPE_INT_RGB);
+        addKeyListener(this);
     }
 
     private void drawGrid(Graphics g) {
@@ -65,8 +71,8 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
             imageBuffer = new BufferedImage(getViewPortSize().width, getViewPortSize().height, BufferedImage.TYPE_INT_RGB);
 
         loop:
-        for (int y = 0; y < getViewPortSize().height / gridCellHeight; y++) {
-            for (int x = 0; x < getViewPortSize().width / gridCellWidth; x++) {
+        for (int y = 0 + insetTB; y < (getViewPortSize().height / gridCellHeight) - (insetTB * 2); y++) {
+            for (int x = 0 + insetLR; x < (getViewPortSize().width / gridCellWidth) - insetLR; x++) {
                 Optional<DrawableCell<T>> c;
                 if (!(c = getDrawableCell(x, y)).isPresent())
                     c = createDrawableCell(x, y);
@@ -181,7 +187,7 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
 
     public Optional<DrawableCell<T>> getDrawableCell(int x, int y) {
         int index = ((y * (gridSize.width / gridCellWidth) + x));
-        if (index > drawableCells.length || index < 0)
+        if (index >= drawableCells.length || index < 0)
             return Optional.empty();
         return Optional.ofNullable(drawableCells[index]);
     }
@@ -220,4 +226,22 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
     }
 
     protected abstract Dimension getViewPortSize();
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        System.out.println("here");
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        System.out.println("here");
+        if (e.getKeyCode() == KeyEvent.VK_LEFT)
+            yOffset -= 10;
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
 }

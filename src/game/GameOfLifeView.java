@@ -3,20 +3,17 @@ package game;
 import game.interfaces.IGameOfLife;
 import game.interfaces.IUpdateable;
 import game.interfaces.Renderable;
-import game.listeners.GOLKeyPressListener;
 import objects.Cell;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 /**
  * Created by Dale on 8/03/16.
  */
-public class GameOfLifeView implements IGameOfLife, Runnable, WindowListener, ComponentListener {
+public class GameOfLifeView implements IGameOfLife, Runnable, ComponentListener {
 
     /**
      * The constant Time between updates.
@@ -44,11 +41,6 @@ public class GameOfLifeView implements IGameOfLife, Runnable, WindowListener, Co
     private final double frameHeight;
 
     /**
-     * Listeners
-     */
-    private final GOLKeyPressListener golKeyPressListener = new GOLKeyPressListener();
-
-    /**
      * Render items
      */
     private final Renderable<Graphics>[] renderableItems;
@@ -74,7 +66,8 @@ public class GameOfLifeView implements IGameOfLife, Runnable, WindowListener, Co
         frameHeight = d.getHeight();
         gameDimension = d;
         gameFrame.setSize(d);
-        gameOfLifePanel = new GameOfLifeGrid(10000, 10000, 10, 10, () -> new Cell()) {
+        DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
+        gameOfLifePanel = new GameOfLifeGrid(dm.getWidth(), dm.getHeight(), 0, 0, 10, 10, () -> new Cell()) {
             @Override
             protected Dimension getViewPortSize() {
                 return new Dimension(gameFrame.getWidth(), gameFrame.getHeight());
@@ -82,7 +75,6 @@ public class GameOfLifeView implements IGameOfLife, Runnable, WindowListener, Co
         };
         renderableItems = new Renderable[]{gameOfLifePanel};
         updatebleItems = new IUpdateable[]{gameOfLifePanel};
-        gameFrame.addWindowListener(this);
         gameFrame.addComponentListener(this);
         gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
@@ -107,13 +99,16 @@ public class GameOfLifeView implements IGameOfLife, Runnable, WindowListener, Co
 
     @Override
     public void init() {
+        GridLayout gridLayout = new GridLayout(2, 1);
         gameOfLifePanel.setSize(gameDimension);
+        gridLayout.addLayoutComponent("gamePanel", gameOfLifePanel);
+        gridLayout.preferredLayoutSize(gameFrame);
         startButton.setBounds(400 - 70, 650, 80, 30);
         startButton.addActionListener(e -> upd = true);
         gameFrame.add(startButton);
         gameFrame.add(gameOfLifePanel);
         gameFrame.setVisible(true);
-        gameFrame.addKeyListener(golKeyPressListener);
+        gameFrame.addKeyListener(gameOfLifePanel);
         new Thread(GameOfLifeView._getInstance()).start();
     }
 
@@ -191,41 +186,6 @@ public class GameOfLifeView implements IGameOfLife, Runnable, WindowListener, Co
                 }
             }
         }
-    }
-
-    @Override
-    public void windowOpened(WindowEvent e) {
-        pause = false;
-    }
-
-    @Override
-    public void windowClosing(WindowEvent e) {
-        stop();
-    }
-
-    @Override
-    public void windowClosed(WindowEvent e) {
-        stop();
-    }
-
-    @Override
-    public void windowIconified(WindowEvent e) {
-        pause = true;
-    }
-
-    @Override
-    public void windowDeiconified(WindowEvent e) {
-        pause = true;
-    }
-
-    @Override
-    public void windowActivated(WindowEvent e) {
-        pause = false;
-    }
-
-    @Override
-    public void windowDeactivated(WindowEvent e) {
-        pause = true;
     }
 
     @Override
