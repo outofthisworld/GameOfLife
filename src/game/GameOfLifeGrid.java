@@ -67,10 +67,10 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
         addKeyListener(this);
     }
 
-    private void drawGrid(Graphics g) {
+    protected void drawGrid(Graphics g) {
         loop:
-        for (int y = 0 + insetTB; y < (getViewPortSize().height / gridCellHeight) - (insetTB * 2); y++) {
-            for (int x = 0 + insetLR; x < (getViewPortSize().width / gridCellWidth) - insetLR; x++) {
+        for (int y = 0 + insetTB; y < (getViewPortSize().height / gridCellHeight) - (insetTB); y++) {
+            for (int x = 0 + insetLR; x < (getViewPortSize().width / gridCellWidth) - (insetLR) * scale; x++) {
                 Optional<DrawableCell<T>> c;
                 if (!(c = getDrawableCell(x, y)).isPresent())
                     c = createDrawableCell(x, y);
@@ -85,7 +85,7 @@ public abstract class GameOfLifeGrid<T extends ICell> extends Component implemen
         imageBuffer.getGraphics().clearRect(0, 0, getViewPortSize().width, getViewPortSize().height);
     }
 
-    public Optional<DrawableCell<T>> createDrawableCell(int x, int y) {
+    protected Optional<DrawableCell<T>> createDrawableCell(int x, int y) {
         if ((y * (gridSize.width / gridCellWidth) + x) > drawableCells.length ||
                 y * (gridSize.width / gridCellWidth) + x < 0)
             return Optional.empty();

@@ -62,6 +62,7 @@ public class GameOfLifeView implements IGameOfLife, Runnable, ComponentListener 
      */
     private GameOfLifeView(String gameTitle, Dimension d) {
         gameFrame = new JFrame(gameTitle);
+        gameFrame.setResizable(false);
         frameWidth = d.getWidth();
         frameHeight = d.getHeight();
         gameDimension = d;
@@ -191,7 +192,7 @@ public class GameOfLifeView implements IGameOfLife, Runnable, ComponentListener 
 
     @Override
     public void componentResized(ComponentEvent e) {
-        startButton.setBounds(e.getComponent().getWidth() / 2 - 70, gameFrame.getHeight() - 100, 80, 30);
+        startButton.setBounds(e.getComponent().getWidth() / 2 - 80, gameFrame.getHeight() - 100, 80, 30);
     }
 
     @Override
